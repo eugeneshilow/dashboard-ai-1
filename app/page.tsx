@@ -1,101 +1,122 @@
-import Image from "next/image";
+'use client';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { marketData, MarketData } from './data/market-data';
+import { newsData, NewsItem } from './data/news-data';
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const RADIAN = Math.PI / 180;
+
+interface CustomizedLabelProps {
+  cx: number;
+  cy: number;
+  midAngle: number;
+  innerRadius: number;
+  outerRadius: number;
+  percent: number;
+  index: number;
+}
+
+const renderCustomizedLabel = ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent
+}: CustomizedLabelProps) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const pieData = [
+    { name: 'AI Robotics', value: marketData[marketData.length-1]['AI Robotics'] },
+    { name: 'Autonomous & Sensor', value: marketData[marketData.length-1]['Autonomous & Sensor Technology'] },
+    { name: 'Computer Vision', value: marketData[marketData.length-1]['Computer Vision'] },
+    { name: 'Machine Learning', value: marketData[marketData.length-1]['Machine Learning'] },
+    { name: 'NLP', value: marketData[marketData.length-1]['Natural Language Processing'] }
+  ];
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  return (
+    <div className="h-screen w-full p-4 flex flex-col">
+      <h1 className="text-2xl font-bold mb-2">AI Market Analysis Dashboard</h1>
+      
+      <div className="flex-1 grid grid-cols-[2fr,1fr] grid-rows-2 gap-4">
+        {/* Bar Chart */}
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h2 className="text-xl font-bold">Market Size Growth</h2>
+          <div className="h-[90%]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={marketData}>
+                <XAxis dataKey="year" />
+                <YAxis label={{ value: 'USD (Billions)', angle: -90, position: 'insideLeft' }} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="Natural Language Processing" stackId="a" fill="#82ca9d" />
+                <Bar dataKey="Machine Learning" stackId="a" fill="#ffc658" />
+                <Bar dataKey="Computer Vision" stackId="a" fill="#8884d8" />
+                <Bar dataKey="Autonomous & Sensor Technology" stackId="a" fill="#000000" />
+                <Bar dataKey="AI Robotics" stackId="a" fill="#0066cc" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* News Section */}
+        <div className="bg-gray-50 p-4 rounded-lg shadow row-span-2 overflow-y-auto">
+          <h2 className="text-xl font-bold sticky top-0 bg-gray-50 pb-2">Latest AI News</h2>
+          <div className="space-y-2">
+            {newsData.map((news, index) => (
+              <div key={index} className="border-b border-gray-200 pb-2 last:border-b-0">
+                <div className="flex justify-between items-start mb-1">
+                  <h3 className="font-semibold text-sm">{news.title}</h3>
+                  <span className="text-xs text-gray-500">{news.date}</span>
+                </div>
+                <ul className="list-disc list-inside text-xs text-gray-600 mb-1">
+                  {news.details.map((detail, idx) => (
+                    <li key={idx}>{detail}</li>
+                  ))}
+                </ul>
+                <p className="text-xs text-gray-400">Source: {news.source}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Pie Chart */}
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h2 className="text-xl font-bold">2030 Market Distribution</h2>
+          <div className="h-[90%]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={renderCustomizedLabel}
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => `$${value}B`} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
